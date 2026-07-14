@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eastern Nephrology Anemia Protocol</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+        }
+        .form-input {
+            width: 100%;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            border-radius: 0.5rem;
+            padding: 0.625rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+        .conditional-field {
+            display: none;
+        }
+        .output-card {
+            transition: all 0.3s ease;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .action-radio {
+            accent-color: #0284c7;
+            width: 1rem;
+            height: 1rem;
+            margin-top: 0.125rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Anemia Master Protocol Engine</h1>
+                <p class="text-slate-500 mt-1">Autonomous decision support for Infusion Suites (Aranesp, Iron, B12/Folate)</p>
+            </div>
+            <div class="hidden md:block">
+                <span class="bg-brand-100 text-brand-700 px-3 py-1 rounded-full text-sm font-semibold">ENA Clinical</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-5 space-y-6">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800 border-b pb-2">1. Patient Status & Vitals</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">ESA Status</label>
+                            <select id="esa_status" class="form-input">
+                                <option value="not_on">Patient NOT on ESA</option>
+                                <option value="active">Patient currently ON Aranesp (Active)</option>
+                                <option value="on_hold">Patient currently ON HOLD for Aranesp</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Weight (kg)</label>
+                            <input type="number" id="weight" class="form-input" placeholder="e.g. 85">
+                        </div>
+                        <div class="col-span-2 mt-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Current Blood Pressure</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" id="bp_sys" class="form-input text-center" placeholder="Sys">
+                                <span class="text-slate-400 font-bold">/</span>
+                                <input type="number" id="bp_dia" class="form-input text-center" placeholder="Dia">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aranesp Details (Conditional) -->
+                    <div id="aranesp_details" class="conditional-field space-y-4 pt-4 border-t border-slate-100">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Current/Last Aranesp Dose (mcg)</label>
+                            <input type="number" id="current_dose" class="form-input" placeholder="e.g. 40">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Previous Hemoglobin (g/dL)</label>
+                            <input type="number" step="0.1" id="prev_hb" class="form-input" placeholder="e.g. 9.2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800 border-b pb-2">2. Today's Labs</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Current Hemoglobin (g/dL)</label>
+                            <input type="number" step="0.1" id="current_hb" class="form-input border-brand-500 focus:ring-brand-500 bg-brand-50 font-semibold" placeholder="e.g. 9.8">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">TSAT (%)</label>
+                            <input type="number" id="tsat" class="form-input" placeholder="e.g. 18">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Ferritin (ng/mL)</label>
+                            <input type="number" id="ferritin" class="form-input" placeholder="e.g. 150">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Vitamin B12 (pg/mL)</label>
+                            <input type="number" id="b12" class="form-input" placeholder="e.g. 300">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Folate (ng/mL)</label>
+                            <input type="number" step="0.1" id="folate" class="form-input" placeholder="e.g. 5.0">
+                        </div>
+
+                        <div class="col-span-2 pt-2">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">MMA Status (If B12 200-400)</label>
+                            <select id="mma_status" class="form-input">
+                                <option value="not_checked">Not Checked / N/A</option>
+                                <option value="elevated">Elevated (>0.4)</option>
+                                <option value="normal">Normal</option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-2 flex items-start pt-2">
+                            <div class="flex items-center h-5">
+                                <input id="symptoms" type="checkbox" class="w-5 h-5 text-brand-600 bg-slate-100 border-slate-300 rounded focus:ring-brand-500">
+                            </div>
+                            <label for="symptoms" class="ml-2 text-sm font-medium text-slate-700">Patient has Macrocytosis (MCV>100) or Neuropathy</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Patient Supplement Preference Toggle -->
+                <div id="sourcing_container" class="conditional-field bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col xl:flex-row xl:items-center justify-between">
+                        <div class="mb-3 xl:mb-0">
+                            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Patient Supplement Preference</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Select routing for oral Iron/Folate to generate rationales & actions.</p>
+                        </div>
+                        <div class="flex space-x-6">
+                            <label class="flex items-center space-x-2 text-sm font-medium text-slate-800 cursor-pointer">
+                                <input type="radio" name="sourcing" value="local" checked class="action-radio h-4 w-4">
+                                <span>Local Pharmacy (Rx/OTC)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-sm font-medium text-slate-800 cursor-pointer">
+                                <input type="radio" name="sourcing" value="store" class="action-radio h-4 w-4">
+                                <span>Clinic Storefront</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Warnings Banner -->
+                <div id="safety_banner" class="hidden bg-red-50 border border-red-200 p-4 rounded-xl shadow-sm">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Critical Safety Warnings</h3>
+                            <div id="safety_text" class="mt-2 text-sm text-red-700 space-y-2 font-medium">
+                                <!-- Dynamic warnings -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aranesp Output -->
+                <div id="esa_card" class="output-card bg-white p-6 rounded-2xl shadow-sm border-l-4 border-slate-200 relative overflow-hidden">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">1. Aranesp Algorithm Directive</h3>
+                    <div id="esa_directive" class="text-lg font-semibold text-slate-800 leading-snug">
+                        Enter Hemoglobin to evaluate ESA...
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-slate-100 bg-slate-50 -mx-6 -mb-6 p-4">
+                        <p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nurse Action Plan (Select to chart):</p>
+                        <div id="esa_actions" class="space-y-2">
+                            <span class="text-sm text-slate-400 italic">Awaiting data...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Iron Output -->
+                <div id="iron_card" class="output-card bg-white p-6 rounded-2xl shadow-sm border-l-4 border-slate-200 overflow-hidden">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">2. Iron Directive</h3>
+                    <div id="iron_directive" class="text-base font-medium text-slate-800 leading-snug">
+                        Enter TSAT and Ferritin...
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-slate-100 bg-slate-50 -mx-6 -mb-6 p-4">
+                        <p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Nurse Action Plan (Select to chart):</p>
+                        <div id="iron_actions" class="space-y-2">
+                            <span class="text-sm text-slate-400 italic">Awaiting data...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nutritional Output -->
+                <div id="nut_card" class="output-card bg-white p-6 rounded-2xl shadow-sm border-l-4 border-slate-200 overflow-hidden">
+                    <h3 class="text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">3. Nutritional Directive (B12 / Folate)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-4 -ml-6 -mb-6 rounded-tr-lg">
+                            <div id="b12_directive" class="text-sm font-medium text-slate-800 leading-snug mb-3">
+                                Enter B12...
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">B12 Plan:</p>
+                            <div id="b12_actions" class="space-y-2">
+                                <span class="text-xs text-slate-400 italic">Awaiting data...</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-4 -mr-6 -mb-6 rounded-tl-lg">
+                            <div id="folate_directive" class="text-sm font-medium text-slate-800 leading-snug mb-3">
+                                Enter Folate...
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide">Folate Plan:</p>
+                            <div id="folate_actions" class="space-y-2">
+                                <span class="text-xs text-slate-400 italic">Awaiting data...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-sm">
+                    <h3 class="uppercase tracking-wider font-bold text-slate-500 mb-2">Lab Billing & ICD-10 Cheat Sheet</h3>
+                    <p class="text-slate-600 mb-3">Nutritional labs (B12, Folate, MMA) face high insurance denial rates. Ensure one of the following is linked:</p>
+                    <ul class="list-disc pl-5 text-slate-700 space-y-2 font-medium">
+                        <li><span class="bg-white border border-slate-200 px-1 rounded text-slate-800 font-bold">Z79.899</span> (Long term use of other meds) - <i>For patients on Metformin or PPIs.</i></li>
+                        <li><span class="bg-white border border-slate-200 px-1 rounded text-slate-800 font-bold">G62.9</span> (Polyneuropathy, unspecified) - <i>If patient has diabetic or unspecified neuropathy.</i></li>
+                        <li><span class="bg-white border border-slate-200 px-1 rounded text-slate-800 font-bold">R71.8</span> (Other abnormal findings of blood) - <i>Guarantees coverage if Macrocytosis (MCV > 100) is present.</i></li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                    <button id="btn_copy" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-4 rounded-xl shadow-md transition-all flex items-center justify-center transform hover:-translate-y-0.5">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <span id="btn_copy_text">Copy Chart Note & Nurse Actions</span>
+                    </button>
+                    <button id="btn_clear" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-4 px-6 rounded-xl shadow-sm transition-all flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Clear Form
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden textarea for clipboard -->
+    <textarea id="hidden_clipboard" class="hidden" style="position: absolute; left: -9999px;"></textarea>
+
+    <script>
+        const ui = {
+            inputs: {
+                esaStatus: document.getElementById('esa_status'),
+                weight: document.getElementById('weight'),
+                bpSys: document.getElementById('bp_sys'),
+                bpDia: document.getElementById('bp_dia'),
+                currentDose: document.getElementById('current_dose'),
+                prevHb: document.getElementById('prev_hb'),
+                currentHb: document.getElementById('current_hb'),
+                tsat: document.getElementById('tsat'),
+                ferritin: document.getElementById('ferritin'),
+                b12: document.getElementById('b12'),
+                folate: document.getElementById('folate'),
+                mmaStatus: document.getElementById('mma_status'),
+                symptoms: document.getElementById('symptoms')
+            },
+            cards: {
+                safetyBanner: document.getElementById('safety_banner'),
+                safetyText: document.getElementById('safety_text'),
+                esaCard: document.getElementById('esa_card'),
+                esaDir: document.getElementById('esa_directive'),
+                esaActions: document.getElementById('esa_actions'),
+                ironCard: document.getElementById('iron_card'),
+                ironDir: document.getElementById('iron_directive'),
+                ironActions: document.getElementById('iron_actions'),
+                nutCard: document.getElementById('nut_card'),
+                b12Dir: document.getElementById('b12_directive'),
+                b12Actions: document.getElementById('b12_actions'),
+                folateDir: document.getElementById('folate_directive'),
+                folateActions: document.getElementById('folate_actions')
+            },
+            sections: {
+                aranespDetails: document.getElementById('aranesp_details'),
+                sourcingContainer: document.getElementById('sourcing_container')
+            }
+        };
+
+        const validVials = [40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 300];
+
+        function getNextVial(current) {
+            let closest = validVials.reduce((prev, curr) => Math.abs(curr - current) < Math.abs(prev - current) ? curr : prev);
+            let idx = validVials.indexOf(closest);
+            return idx < validVials.length - 1 ? validVials[idx + 1] : validVials[validVials.length - 1];
+        }
+
+        function getPrevVial(current) {
+            let closest = validVials.reduce((prev, curr) => Math.abs(curr - current) < Math.abs(prev - current) ? curr : prev);
+            let idx = validVials.indexOf(closest);
+            return idx > 0 ? validVials[idx - 1] : 40;
+        }
+
+        function styleCard(card, htmlStr) {
+            let colorBorder = 'border-slate-300';
+            if (htmlStr.includes('🛑') || htmlStr.includes('CRITICAL') || htmlStr.includes('🚨')) { colorBorder = 'border-red-500'; }
+            else if (htmlStr.includes('⚠️') || htmlStr.includes('⬆️') || htmlStr.includes('🔄') || htmlStr.includes('🟡')) { colorBorder = 'border-amber-400'; }
+            else if (htmlStr.includes('🟢') || htmlStr.includes('✅')) { colorBorder = 'border-emerald-500'; }
+            card.className = `output-card bg-white p-6 rounded-2xl shadow-sm border-l-4 ${colorBorder} relative overflow-hidden`;
+        }
+
+        function renderActionRadio(container, name, options) {
+            if (!options || options.length === 0) {
+                container.innerHTML = `<span class="text-sm text-slate-400 italic">Awaiting data...</span>`;
+                return;
+            }
+            // Keep previously selected option if it exists in new options
+            const currentSelected = document.querySelector(`input[name="${name}"]:checked`)?.value;
+            let checkIdx = options.findIndex(opt => opt.val === currentSelected);
+            if (checkIdx === -1) checkIdx = 0; // Default to first
+
+            container.innerHTML = options.map((opt, i) => `
+                <label class="flex items-start space-x-2 text-sm cursor-pointer hover:bg-white p-1.5 rounded transition">
+                    <input type="radio" name="${name}" value="${opt.val}" class="action-radio" ${i === checkIdx ? 'checked' : ''}>
+                    <span class="text-slate-700 font-medium">${opt.label}</span>
+                </label>
+            `).join('');
+        }
+
+        function runProtocolEngine() {
+            const isNotOnESA = ui.inputs.esaStatus.value === 'not_on';
+            const isOnHold = ui.inputs.esaStatus.value === 'on_hold';
+            const isActive = ui.inputs.esaStatus.value === 'active';
+            
+            const weight = parseFloat(ui.inputs.weight.value) || 0;
+            const sysBP = parseInt(ui.inputs.bpSys.value) || 0;
+            const diaBP = parseInt(ui.inputs.bpDia.value) || 0;
+            const hb = parseFloat(ui.inputs.currentHb.value) || 0;
+            const prevHb = parseFloat(ui.inputs.prevHb.value) || 0;
+            const dose = parseFloat(ui.inputs.currentDose.value) || 0;
+            const tsat = parseFloat(ui.inputs.tsat.value) || 0;
+            const ferritin = parseFloat(ui.inputs.ferritin.value) || 0;
+            const b12 = parseFloat(ui.inputs.b12.value) || 0;
+            const folate = parseFloat(ui.inputs.folate.value) || 0;
+            const mma = ui.inputs.mmaStatus.value;
+            const symp = ui.inputs.symptoms.checked;
+            
+            const sourcingEl = document.querySelector('input[name="sourcing"]:checked');
+            const sourcing = sourcingEl ? sourcingEl.value : 'local';
+
+            ui.sections.aranespDetails.style.display = isNotOnESA ? 'none' : 'block';
+
+            let warnings = [];
+            if (sysBP > 180 || diaBP > 90) warnings.push("BP > 180/90: Contact provider PRIOR to giving dose to clarify if dose should be given.");
+            if (hb > 0 && hb < 8.5) warnings.push("HGB < 8.5 g/dL: Contact provider to clarify if blood transfusion is indicated.");
+
+            if (warnings.length > 0) {
+                ui.cards.safetyBanner.classList.remove('hidden');
+                ui.cards.safetyText.innerHTML = warnings.map(w => `<p>• ${w}</p>`).join('');
+            } else {
+                ui.cards.safetyBanner.classList.add('hidden');
+                ui.cards.safetyText.innerHTML = '';
+            }
+
+            // Flags to determine if Oral Sourcing toggle should be shown
+            let recommendsOralIron = false;
+            let recommendsOralFolate = false;
+
+            // --- ESA PATHWAY ---
+            let aranespHTML = "Awaiting Hemoglobin data...";
+            let aranespOpts = [];
+
+            if (hb > 0) {
+                if (isNotOnESA) {
+                    if (hb > 10.0) {
+                        aranespHTML = "✅ <b>HEMOGLOBIN > 10.0:</b> Do not initiate Aranesp.";
+                        aranespOpts = [
+                            {val: "No Aranesp indicated (Hb > 10.0)", label: "No Aranesp indicated"},
+                            {val: "Initiate Aranesp (MD Override)", label: "Initiate Aranesp (Physician Override)"}
+                        ];
+                    } else if (weight > 0) {
+                        let startDose = weight > 120 ? 60 : 40;
+                        aranespHTML = `🟢 <b>STARTING DOSE:</b> WT ${(weight > 120 ? '>=' : '<')} 120 kg.<br>Administer <b>${startDose} mcg SQ Q4 Weeks</b>.`;
+                        aranespOpts = [
+                            {val: `Initiate Aranesp ${startDose} mcg SQ`, label: `Initiate Aranesp ${startDose} mcg SQ`},
+                            {val: "Hold Aranesp (MD Override)", label: "Hold Aranesp (Physician Override)"}
+                        ];
+                    } else {
+                        aranespHTML = "<span class='text-slate-500'>Enter Patient Weight to calculate starting dose.</span>";
+                    }
+                } 
+                else if (isOnHold) {
+                    if (hb < 9.5 && dose > 0) {
+                        let lowerDose = getPrevVial(dose);
+                        aranespHTML = `🔄 <b>RESUME ARANESP:</b> Hemoglobin < 9.5 g/dL.<br>Resume at LOWER DOSE (<b>${lowerDose} mcg</b>) & repeat labs in 4 weeks.`;
+                        aranespOpts = [
+                            {val: `Resume Aranesp at decreased dose (${lowerDose} mcg)`, label: `Resume Aranesp at decreased dose (${lowerDose} mcg)`},
+                            {val: "Maintain Hold (MD Override)", label: "Maintain Hold (Physician Override)"}
+                        ];
+                    } else if (hb >= 9.5) {
+                        aranespHTML = `🛑 <b>MAINTAIN HOLD:</b> Hemoglobin is >= 9.5 g/dL.<br>Continue to hold Aranesp & repeat labs in 4 weeks.`;
+                        aranespOpts = [
+                            {val: "Maintain Aranesp Hold per protocol", label: "Maintain Aranesp Hold per protocol"},
+                            {val: "Resume Aranesp (MD Override)", label: "Resume Aranesp (Physician Override)"}
+                        ];
+                    } else {
+                        aranespHTML = "<span class='text-slate-500'>Enter previous dose to calculate resume dose.</span>";
+                    }
+                } 
+                else if (isActive) {
+                    if (hb > 10.0) {
+                        aranespHTML = `🛑 <b>HOLD ARANESP:</b> Hemoglobin > 10.0 g/dL.<br>Hold dose & repeat labs in 4 weeks.`;
+                        aranespOpts = [
+                            {val: "Hold Aranesp per protocol (Hb > 10)", label: "Hold Aranesp per protocol (Hb > 10)"},
+                            {val: `Administer dose ${dose} mcg (MD Override)`, label: "Administer dose (Physician Override)"}
+                        ];
+                    } else if (prevHb > 0 && dose > 0) {
+                        let increase = hb - prevHb;
+                        if (increase > 1.0) {
+                            aranespHTML = `✅ <b>CONTINUE CURRENT DOSE:</b> Hemoglobin increased by > 1 g/dL.<br>Administer <b>${dose} mcg SQ Q4 Weeks</b>.`;
+                            aranespOpts = [
+                                {val: `Administer current dose (${dose} mcg SQ)`, label: `Administer current dose (${dose} mcg SQ)`},
+                                {val: "Adjust/Hold dose (MD Override)", label: "Adjust/Hold dose (Physician Override)"}
+                            ];
+                        } else {
+                            let nextDose = getNextVial(dose);
+                            aranespHTML = `⬆️ <b>INCREASE DOSE:</b> Hemoglobin did NOT increase by > 1 g/dL.<br>Increase to next vial size: <b>${nextDose} mcg</b>.`;
+                            aranespOpts = [
+                                {val: `Increase Aranesp dose to ${nextDose} mcg`, label: `Increase Aranesp dose to ${nextDose} mcg`},
+                                {val: `Maintain current dose ${dose} mcg (MD Override)`, label: `Maintain current dose ${dose} mcg (Physician Override)`}
+                            ];
+                        }
+                    } else {
+                        aranespHTML = "<span class='text-slate-500'>Enter Previous Hb and Current Dose to calculate titration.</span>";
+                    }
+                }
+            }
+            ui.cards.esaDir.innerHTML = aranespHTML;
+            styleCard(ui.cards.esaCard, aranespHTML);
+            renderActionRadio(ui.cards.esaActions, 'action_esa', aranespOpts);
+
+            // --- IRON PATHWAY ---
+            let ironHTML = "Awaiting TSAT/Ferritin data...";
+            let ironOpts = [];
+
+            let oralIronStr = (sourcing === 'store') ? "Storefront Iron (Thorne or Douglas Labs)" : "Rx Accrufer 30mg BID or OTC Ferrex 150mg TIW";
+            let ironExplain = '';
+            
+            if (sourcing === 'store') {
+                ironExplain = `
+                <div class="mt-3 bg-brand-50 p-3 rounded text-xs text-brand-900 border border-brand-200 space-y-1">
+                    <p>• <b>Thorne Iron Bisglycinate ($0.24/dose):</b> High-absorption chelate; passes stomach intact to prevent nausea/constipation.</p>
+                    <p>• <b>Douglas Labs TR Iron ($0.33/dose):</b> Steady release without Vitamin C (avoids kidney stone risk).</p>
+                </div>`;
+            } else {
+                ironExplain = `
+                <div class="mt-3 bg-slate-50 p-3 rounded text-xs text-slate-700 border border-slate-200 space-y-1">
+                    <p>• <b>Accrufer 30mg BID:</b> Well tolerated, but faces severe insurance barriers (approx. $0 copay private, $70+ out-of-pocket for Medicare).</p>
+                    <p>• <b>Ferrex 150mg TIW:</b> Take Three-Times-a-Week (TIW) to bypass hepcidin block; massive elemental payload with lower GI toxicity.</p>
+                </div>`;
+            }
+
+            if (tsat > 0 || ferritin > 0) {
+                if (ferritin > 500) {
+                    if (tsat > 0 && tsat < 25) {
+                        ironHTML = "🛑 <b>HOLD IRON (INFLAMMATION):</b> Ferritin > 500 but TSAT < 25%.<br>Indicates reticuloendothelial blockade, not absolute deficit.";
+                    } else {
+                        ironHTML = "🛑 <b>HOLD IRON:</b> Ferritin > 500 ng/mL. Exceeds safety ceiling.";
+                    }
+                    ironOpts = [
+                        {val: "Hold Iron per protocol", label: "Hold Iron per protocol"},
+                        {val: "Administer Iron (MD Override)", label: "Administer Iron (Physician Override)"}
+                    ];
+                } else if (tsat > 0 && tsat < 25) {
+                    recommendsOralIron = true;
+                    ironHTML = `🟢 <b>ADMINISTER IRON:</b> TSAT < 25%.<br>Proceed with IV Iron infusion and/or Oral Iron trial.` + ironExplain;
+                    ironOpts = [
+                        {val: "Order/Administer IV Iron Infusion ONLY", label: "Order IV Iron Infusion ONLY"},
+                        {val: `Trial Oral Iron ONLY: ${oralIronStr}`, label: `Trial Oral Iron ONLY`},
+                        {val: `Order IV Iron AND Trial Oral Iron: ${oralIronStr}`, label: `Order IV Iron AND Trial Oral Iron`},
+                        {val: "Hold Iron (MD Override)", label: "Hold Iron (Physician Override)"}
+                    ];
+                } else if (tsat >= 25 && tsat <= 30) {
+                    recommendsOralIron = true;
+                    ironHTML = `🟡 <b>GRAY ZONE - CONSULT:</b> TSAT 25-30% and Ferritin &le; 500.<br>Consult provider for IV or Oral Iron to spare Aranesp.` + ironExplain;
+                    ironOpts = [
+                        {val: "Hold Iron (Gray Zone)", label: "Hold Iron (Gray Zone)"},
+                        {val: "Order/Administer IV Iron (MD Consulted)", label: "Order IV Iron (MD Consulted)"},
+                        {val: `Trial Oral Iron: ${oralIronStr} (MD Consult)`, label: `Trial Oral Iron (MD Consult)`},
+                        {val: `Order IV Iron AND Trial Oral Iron: ${oralIronStr} (MD Consult)`, label: `Order IV Iron AND Trial Oral Iron (MD Consult)`}
+                    ];
+                } else {
+                    ironHTML = "✅ <b>IRON ADEQUATE:</b> TSAT > 30% and Ferritin &le; 500.";
+                    ironOpts = [
+                        {val: "No Iron indicated", label: "No Iron indicated"}
+                    ];
+                }
+            }
+            ui.cards.ironDir.innerHTML = ironHTML;
+            styleCard(ui.cards.ironCard, ironHTML);
+            renderActionRadio(ui.cards.ironActions, 'action_iron', ironOpts);
+
+            // --- NUTRITIONAL PATHWAY ---
+            let b12HTML = "Enter B12...";
+            let b12Opts = [];
+            
+            if (b12 > 0) {
+                if (b12 < 200) {
+                    b12HTML = '🟢 <b>ADMINISTER B12:</b> Absolute Deficiency.<br>1,000 mcg SQ/IM weekly x 4 wks.';
+                    b12Opts = [
+                        {val: "Administer B12 1,000 mcg SQ/IM", label: "Administer B12 1,000 mcg SQ/IM"},
+                        {val: "Hold B12 (MD Override)", label: "Hold B12 (Physician Override)"}
+                    ];
+                } else if (b12 <= 400 && (mma === 'elevated' || symp)) {
+                    b12HTML = '🟢 <b>ADMINISTER B12:</b> Functional deficiency confirmed.<br>1,000 mcg SQ/IM weekly x 4 wks.';
+                    b12Opts = [
+                        {val: "Administer B12 1,000 mcg SQ/IM", label: "Administer B12 1,000 mcg SQ/IM"},
+                        {val: "Hold B12 (MD Override)", label: "Hold B12 (Physician Override)"}
+                    ];
+                } else if (b12 <= 400 && mma === 'not_checked') {
+                    b12HTML = '⚠️ <b>HOLD B12 / ORDER MMA:</b> Borderline range (200-400).';
+                    b12Opts = [
+                        {val: "Hold B12 / Order MMA lab", label: "Hold B12 / Order MMA lab"},
+                        {val: "Administer B12 1,000 mcg (MD Override)", label: "Administer B12 1,000 mcg (Physician Override)"}
+                    ];
+                } else {
+                    b12HTML = '✅ <b>B12 ADEQUATE:</b> No injection needed.';
+                    b12Opts = [{val: "No B12 indicated", label: "No B12 indicated"}];
+                }
+            } else if (symp) {
+                b12HTML = '🚨 <span class="text-red-700"><b>ORDER B12 LAB:</b> Macrocytosis present.</span>';
+                b12Opts = [{val: "Order STAT B12 Lab", label: "Order STAT B12 Lab"}];
+            }
+            ui.cards.b12Dir.innerHTML = b12HTML;
+            renderActionRadio(ui.cards.b12Actions, 'action_b12', b12Opts);
+
+            let folateHTML = "Enter Folate...";
+            let folateOpts = [];
+            
+            let folStr = (sourcing === 'store') ? "Storefront Folate 1,000 mcg" : "Rx Folic Acid 1mg or OTC Methylfolate 1mg";
+            let folateExplain = '';
+            
+            if (sourcing === 'store') {
+                folateExplain = `
+                <div class="mt-3 bg-brand-50 p-3 rounded text-xs text-brand-900 border border-brand-200">
+                    <p>• <b>Pure Encapsulations Folate ($0.35/dose):</b> Active, methylated form (L-5-MTHF) for rapid absorption without methylation delays.</p>
+                </div>`;
+            } else {
+                 folateExplain = `
+                <div class="mt-3 bg-slate-50 p-3 rounded text-xs text-slate-700 border border-slate-200 space-y-1">
+                    <p>• <b>Rx Folic Acid 1mg:</b> Widely covered, but requires enzymatic conversion in the liver.</p>
+                    <p>• <b>OTC Methylfolate 1mg:</b> Bypasses enzymatic conversion defects for more reliable macrocytic repletion.</p>
+                </div>`;
+            }
+
+            if (folate > 0) {
+                if (folate < 4.0) {
+                    recommendsOralFolate = true;
+                    folateHTML = '🟡 <b>PRESCRIBE FOLATE:</b> Level < 4.0. Needs 1mg daily.' + folateExplain;
+                    folateOpts = [
+                        {val: `Recommend/Prescribe: ${folStr}`, label: `Recommend/Prescribe: ${folStr}`},
+                        {val: "Hold Folate (MD Override)", label: "Hold Folate (Physician Override)"}
+                    ];
+                } else {
+                    folateHTML = '✅ <b>FOLATE ADEQUATE:</b> Level >= 4.0.';
+                    folateOpts = [{val: "No Folate indicated", label: "No Folate indicated"}];
+                }
+            } else if (symp) {
+                folateHTML = '🚨 <span class="text-red-700"><b>ORDER FOLATE LAB:</b> Macrocytosis present.</span>';
+                folateOpts = [{val: "Order STAT Folate Lab", label: "Order STAT Folate Lab"}];
+            }
+            ui.cards.folateDir.innerHTML = folateHTML;
+            renderActionRadio(ui.cards.folateActions, 'action_folate', folateOpts);
+
+            styleCard(ui.cards.nutCard, b12HTML + folateHTML);
+
+            // Toggle the sourcing container visibility
+            if (recommendsOralIron || recommendsOralFolate) {
+                ui.sections.sourcingContainer.style.display = 'block';
+            } else {
+                ui.sections.sourcingContainer.style.display = 'none';
+            }
+        }
+
+        Object.values(ui.inputs).forEach(input => {
+            input.addEventListener('input', runProtocolEngine);
+            input.addEventListener('change', runProtocolEngine);
+        });
+        
+        // Listen to sourcing radio changes
+        document.querySelectorAll('input[name="sourcing"]').forEach(radio => {
+            radio.addEventListener('change', runProtocolEngine);
+        });
+
+        document.getElementById('btn_clear').addEventListener('click', () => {
+            Object.values(ui.inputs).forEach(input => {
+                if (input.type === 'checkbox') input.checked = false;
+                else if (input.tagName === 'SELECT') input.selectedIndex = 0;
+                else input.value = '';
+            });
+            document.querySelector('input[name="sourcing"][value="local"]').checked = true;
+            runProtocolEngine();
+        });
+
+        document.getElementById('btn_copy').addEventListener('click', () => {
+            const getRadioVal = (name) => {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                return checked ? checked.value : 'No action selected';
+            };
+
+            const w = ui.inputs.weight.value || 'N/A';
+            const hb = ui.inputs.currentHb.value || 'N/A';
+            const tsat = ui.inputs.tsat.value || 'N/A';
+            const fer = ui.inputs.ferritin.value || 'N/A';
+            const bp = `${ui.inputs.bpSys.value || '--'}/${ui.inputs.bpDia.value || '--'}`;
+
+            const note = `*** ND-CKD ANEMIA PROTOCOL & NURSING PLAN ***
+Date: ${new Date().toLocaleDateString()}
+Vitals: Wt: ${w} kg | BP: ${bp} mmHg
+Labs: Hb: ${hb} | TSAT: ${tsat}% | Ferritin: ${fer}
+
+[ NURSING PLAN & ACTIONS TAKEN ]
+Aranesp: ${getRadioVal('action_esa')}
+Iron:    ${getRadioVal('action_iron')}
+B12:     ${getRadioVal('action_b12')}
+Folate:  ${getRadioVal('action_folate')}
+
+[ ALGORITHM DIRECTIVE RECORD ]
+- ESA Status: ${document.getElementById('esa_directive').innerText.replace(/\n+/g, ' ').trim()}
+- Iron Status: ${document.getElementById('iron_directive').innerText.replace(/\n+/g, ' ').trim()}
+- B12 Status: ${document.getElementById('b12_directive').innerText.replace(/\n+/g, ' ').trim()}
+- Folate Status: ${document.getElementById('folate_directive').innerText.replace(/\n+/g, ' ').trim()}
+`;
+            
+            const textarea = document.getElementById('hidden_clipboard');
+            textarea.value = note;
+            textarea.style.display = 'block';
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                const btn = document.getElementById('btn_copy');
+                const textSpan = document.getElementById('btn_copy_text');
+                
+                textSpan.innerText = "Copied to Clipboard!";
+                btn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+                btn.classList.remove('bg-brand-600', 'hover:bg-brand-700');
+                
+                setTimeout(() => {
+                    textSpan.innerText = "Copy Chart Note & Nurse Actions";
+                    btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                    btn.classList.add('bg-brand-600', 'hover:bg-brand-700');
+                }, 2500);
+            } catch (err) {
+                console.error('Could not copy text: ', err);
+            }
+            textarea.style.display = 'none';
+        });
+
+        // Initial run
+        runProtocolEngine();
+
+    </script>
+</body>
+</html>
