@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENA Anemia Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .alert-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans p-4">
+
+    <header class="max-w-6xl mx-auto mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-slate-900">Anemia Management Protocol</h1>
+            <p class="text-sm text-slate-500">Clinical Decision Support v6.0</p>
+        </div>
+        <button onclick="copyEHR()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow-sm transition">📋 Copy EHR Note</button>
+    </header>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <div class="space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="font-bold mb-3 border-b pb-2">Patient Profile</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" id="hb" placeholder="Hb (g/dL)" oninput="updateUI()" class="p-2 border rounded">
+                    <input type="number" id="ferritin" placeholder="Ferritin (ng/mL)" oninput="updateUI()" class="p-2 border rounded">
+                    <input type="number" id="tsat" placeholder="TSAT (%)" oninput="updateUI()" class="p-2 border rounded">
+                    <input type="number" id="b12" placeholder="B12 (pg/mL)" oninput="updateUI()" class="p-2 border rounded">
+                </div>
+            </div>
+
+            <div id="selectionPanel" class="bg-blue-50 p-4 rounded-xl border border-blue-200 hidden">
+                <h2 class="font-bold mb-3 text-blue-900 border-b border-blue-200 pb-2">Select Treatment Plan</h2>
+                <div id="selectionInputs" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div class="bg-slate-900 text-white p-5 rounded-xl shadow-lg">
+                <h2 class="font-bold text-slate-400 mb-3 uppercase text-xs">Directives</h2>
+                <div id="directivesOutput" class="space-y-4 text-sm font-medium"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let state = {
+            ironNeeded: false,
+            folateNeeded: false,
+            selectedIron: "",
+            selectedFolate: ""
+        };
+
+        function updateUI() {
+            const hb = parseFloat(document.getElementById('hb').value) || 0;
+            const fer = parseFloat(document.getElementById('ferritin').value) || 0;
+            const tsat = parseFloat(document.getElementById('tsat').value) || 0;
+            const b12 = parseFloat(document.getElementById('b12').value) || 0;
+
+            let directives = [];
+            state.ironNeeded = (tsat < 20 || fer < 100);
+            state.folateNeeded = false; // Logic for folate trigger
+
+            // Logic Simulation
+            if (state.ironNeeded) {
+                directives.push("IRON: Absolute deficiency confirmed.");
+            } else {
+                directives.push("IRON: Levels adequate.");
+            }
+
+            document.getElementById('directivesOutput').innerHTML = directives.map(d => `<p>• ${d}</p>`).join('');
+            
+            const panel = document.getElementById('selectionPanel');
+            const container = document.getElementById('selectionInputs');
+            
+            if (state.ironNeeded) {
+                panel.classList.remove('hidden');
+                container.innerHTML = `
+                    <label class="text-xs font-bold text-blue-800">Choose Iron Supplement:</label>
+                    <select id="ironChoice" onchange="state.selectedIron = this.value" class="w-full p-2 rounded border">
+                        <option value="Accrufer 30mg BID">Accrufer 30mg BID</option>
+                        <option value="Iron Bisglycinate 25mg MWF">Iron Bisglycinate 25mg MWF</option>
+                        <option value="Ferrex 150mg Daily">Ferrex 150mg Daily</option>
+                    </select>
+                `;
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function copyEHR() {
+            const note = `Clinical Protocol Note\nIron: ${state.selectedIron || 'None'}\nLabs: Hb ${document.getElementById('hb').value}`;
+            navigator.clipboard.writeText(note);
+            // Non-alert visual feedback could be added here
+        }
+
+        function clearForm() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
